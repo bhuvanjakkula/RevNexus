@@ -17,7 +17,11 @@ import { fileURLToPath } from 'node:url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const PORT = process.env.PORT || 3030;
+const rawPort = process.env.PORT;
+const parsedPort = parseInt(rawPort, 10);
+// Ensure valid integer port > 0; guard against '0000' or malformed inputs
+const PORT = (!isNaN(parsedPort) && parsedPort > 0) ? parsedPort : (process.env.NODE_ENV === 'production' ? 10000 : 3030);
+const HOST = '0.0.0.0';
 const PUBLIC_DIR = __dirname;
 
 const MIME_TYPES = {
@@ -154,6 +158,13 @@ export function appHandler(req, res) {
   if (req.method === 'OPTIONS') {
     res.writeHead(204);
     res.end();
+    return;
+  }
+
+  // Health check endpoint for Render & cloud balancers
+  if (pathname === '/healthz' || pathname === '/api/health') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ status: 'ok', service: 'RevNexus AI', timestamp: new Date().toISOString() }));
     return;
   }
 
@@ -399,8 +410,8 @@ export function appHandler(req, res) {
 const server = http.createServer(appHandler);
 
 if (!process.env.VERCEL) {
-  server.listen(PORT, () => {
-    console.log(`\n🚀 RevNexus AI Platform running at: http://localhost:${PORT}`);
+  server.listen(PORT, HOST, () => {
+    console.log(`\n🚀 RevNexus AI Platform running at: http://${HOST}:${PORT}`);
     console.log(`🛡️ Post-Quantum Cryptography Active: NIST FIPS 203 (ML-KEM) & FIPS 204 (ML-DSA)`);
     console.log(`📡 Sovereign Quantum-Resistant Cyber Security Suite Online.`);
   });
