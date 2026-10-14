@@ -5655,7 +5655,6 @@ class RevNexusApp {
     this.portalMode = 'signin';
 
     const gatewayLayer = document.getElementById('portal-gateway-layer');
-    const btnSkip = document.getElementById('btn-portal-skip-to-dashboard');
     const btnHeaderToggle = document.getElementById('btn-header-portal-toggle');
     const tabSignIn = document.getElementById('tab-gateway-signin');
     const tabSignUp = document.getElementById('tab-gateway-signup');
@@ -5667,20 +5666,18 @@ class RevNexusApp {
     const inputMobile = document.getElementById('gateway-input-mobile');
     const btnTogglePass = document.getElementById('btn-gateway-toggle-pass');
     const btnSubmit = document.getElementById('btn-gateway-submit');
-    const btnMaster = document.getElementById('btn-gateway-master-clearance');
     const headingTitle = document.getElementById('gateway-heading-title');
     const headingSub = document.getElementById('gateway-heading-subtitle');
     const emailHint = document.getElementById('gateway-email-hint');
     const passHint = document.getElementById('gateway-pass-hint');
 
-    // Open First Web Page Layer by default
-    if (gatewayLayer) gatewayLayer.classList.remove('hidden');
-
-    if (btnSkip && gatewayLayer) {
-      btnSkip.addEventListener('click', () => {
+    // Open First Web Page Layer by default if not authenticated
+    if (gatewayLayer) {
+      if (this.currentUser && this.currentUser.isLoggedIn) {
         gatewayLayer.classList.add('hidden');
-        this.showToast('🚀 Entered RevNexus AI Live Workspace');
-      });
+      } else {
+        gatewayLayer.classList.remove('hidden');
+      }
     }
 
     if (btnHeaderToggle && gatewayLayer) {
@@ -5838,9 +5835,9 @@ class RevNexusApp {
       });
     }
 
-    // Default to Sign Up tab active on first page load
-    if (tabSignUp) {
-      tabSignUp.click();
+    // Default to Sign In tab active on first page load
+    if (tabSignIn) {
+      tabSignIn.click();
     }
   }
 
