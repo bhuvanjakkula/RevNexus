@@ -7,7 +7,6 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
-    "build": "echo 'RevNexus AI Build Verified'",
     "test": "node scripts/test_ui_cleanliness_and_auth.cjs && node scripts/test_portal_layer.cjs"
   },
   "engines": {
