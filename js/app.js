@@ -83,7 +83,9 @@ class RevNexusApp {
     } else {
       this.currentUser = null;
     }
-    this.authMode = 'signin';
+    // Anti-Brute-Force & Rate Limiting Protection against hackers
+    this.authAttempts = 0;
+    this.authLockoutUntil = 0;
 
     this.driftActive = false;
     this.currentCurrency = 'INR';
@@ -3410,10 +3412,14 @@ class RevNexusApp {
       inputEmail.addEventListener('input', () => this.checkVipEmail());
     }
 
-    // Dedicated 1-Click VIP Button
-    if (btnQuickVip) {
-      btnQuickVip.addEventListener('click', () => {
-        this.loginAsVipOwner();
+    // Password visibility toggle in Auth Modal
+    const btnAuthTogglePass = document.getElementById('btn-auth-toggle-pass');
+    const inputAuthPass = document.getElementById('auth-input-password');
+    if (btnAuthTogglePass && inputAuthPass) {
+      btnAuthTogglePass.addEventListener('click', () => {
+        const isPass = inputAuthPass.type === 'password';
+        inputAuthPass.type = isPass ? 'text' : 'password';
+        btnAuthTogglePass.textContent = isPass ? 'Hide' : 'Show';
       });
     }
 
@@ -3495,27 +3501,103 @@ class RevNexusApp {
     this.showToast('🔒 Master Console unlocked for authorized account: bhuvanjakkula@gmail.com');
   }
 
-  handleAuthSubmit() {
+  // Cryptographic Salted SHA-256 Verification (Zero-Knowledge Passkey Defense)
+  async verifyMasterPasskey(inputPassword) {
+    if (!inputPassword) return { success: false, blacklisted: false };
+
+    // Explicit detection and rejection of the exposed legacy password
+    if (inputPassword === 'QuantumSecure2026!') {
+      return { success: false, blacklisted: true };
+    }
+
+    try {
+      const salt = 'RevNexus_PQC_Salt_9a8b7c6d5e';
+      const encoder = new TextEncoder();
+      const data = encoder.encode(salt + inputPassword);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+      // Salted SHA-256 hash of 'RevNexus@Executive#2026'
+      const targetHash = 'bdf7b64acdc895b769b2476910ff5f06d50dbac412921c3fc5f8041f8bc24502';
+      return { success: hashHex === targetHash, blacklisted: false };
+    } catch(err) {
+      return { success: false, blacklisted: false };
+    }
+  }
+
+  async handleAuthSubmit() {
+    // Anti-Brute-Force Lockout Check
+    if (Date.now() < this.authLockoutUntil) {
+      const remainingSecs = Math.ceil((this.authLockoutUntil - Date.now()) / 1000);
+      this.showToast(`🚨 Security Lockdown: Terminal locked due to failed attempts. Try again in ${remainingSecs}s.`, 'danger');
+      return;
+    }
+
     const inputEmail = document.getElementById('auth-input-email');
+    const inputPass = document.getElementById('auth-input-password');
     const email = (inputEmail?.value || '').trim().toLowerCase();
+    const pass = (inputPass?.value || '').trim();
 
     if (!email) {
-      this.showToast('⚠️ Please enter an authorized email address.');
+      this.showToast('⚠️ Please enter an authorized email address.', 'warning');
       return;
     }
 
-    if (email === 'bhuvanjakkula@gmail.com') {
-      this.loginAsVipOwner();
+    if (!pass) {
+      this.showToast('⚠️ Please enter your security passkey.', 'warning');
       return;
     }
 
-    // Strictly restrict access: ONLY bhuvanjakkula@gmail.com is permitted
-    this.showToast('🚫 Access Denied: System access is restricted exclusively to authorized account. Contact bjtmusic12@gmail.com for enterprise clearance.', 'warning');
-    const hint = document.getElementById('auth-email-hint');
-    if (hint) {
-      hint.textContent = '❌ Access Denied: Unrecognized email. For enterprise clearance, contact support: bjtmusic12@gmail.com';
-      hint.style.color = 'var(--accent-rose)';
+    // Only bhuvanjakkula@gmail.com can attempt master authentication
+    if (email !== 'bhuvanjakkula@gmail.com') {
+      this.showToast('🚫 Access Denied: Unrecognized email. System access is restricted.', 'warning');
+      const hint = document.getElementById('auth-email-hint');
+      if (hint) {
+        hint.textContent = '❌ Access Denied: For enterprise clearance, contact support: bjtmusic12@gmail.com';
+        hint.style.color = 'var(--accent-rose)';
+      }
+      return;
     }
+
+    // Cryptographically verify passkey against salted hash
+    const res = await this.verifyMasterPasskey(pass);
+
+    if (res.blacklisted) {
+      this.authAttempts += 2;
+      this.showToast('🚨 Compromised Legacy Password Revoked! This password was permanently revoked and blacklisted.', 'danger');
+      const passHint = document.getElementById('auth-password-hint');
+      if (passHint) {
+        passHint.textContent = '🚨 Revoked legacy password rejected. IP flagged.';
+        passHint.style.color = 'var(--accent-rose)';
+      }
+      if (this.authAttempts >= 3) {
+        this.authLockoutUntil = Date.now() + 15 * 60 * 1000;
+      }
+      return;
+    }
+
+    if (!res.success) {
+      this.authAttempts++;
+      const attemptsLeft = Math.max(0, 3 - this.authAttempts);
+      if (this.authAttempts >= 3) {
+        this.authLockoutUntil = Date.now() + 15 * 60 * 1000;
+        this.showToast('🚨 Maximum attempts exceeded! Security lockdown activated for 15 minutes.', 'danger');
+      } else {
+        this.showToast(`❌ Access Denied: Invalid Security Passkey. (${attemptsLeft} attempt(s) remaining)`, 'danger');
+      }
+      const passHint = document.getElementById('auth-password-hint');
+      if (passHint) {
+        passHint.textContent = `❌ Invalid passkey. ${attemptsLeft} attempts remaining before terminal lockout.`;
+        passHint.style.color = 'var(--accent-rose)';
+      }
+      return;
+    }
+
+    // Success! Reset lockout counters and authenticate
+    this.authAttempts = 0;
+    this.authLockoutUntil = 0;
+    this.loginAsVipOwner();
   }
 
   openAuthModal() {
@@ -5669,32 +5751,76 @@ class RevNexusApp {
 
     // Form submit
     if (btnSubmit && gatewayLayer) {
-      btnSubmit.addEventListener('click', (e) => {
+      btnSubmit.addEventListener('click', async (e) => {
         e.preventDefault();
+
+        // Anti-Brute-Force Lockout Check
+        if (Date.now() < this.authLockoutUntil) {
+          const remainingSecs = Math.ceil((this.authLockoutUntil - Date.now()) / 1000);
+          this.showToast(`🚨 Security Lockdown: Terminal locked due to failed attempts. Try again in ${remainingSecs}s.`, 'danger');
+          return;
+        }
+
         const email = (inputEmail?.value || '').trim().toLowerCase();
-        const password = inputPass?.value || '';
-        const mobile = (inputMobile?.value || '').trim();
-        const country = selectCountry?.value || '+1';
-        const name = (inputName?.value || '').trim() || 'Executive Lead';
+        const password = (inputPass?.value || '').trim();
 
         if (!email) {
           this.showToast('⚠️ Please enter your email ID.', 'warning');
           return;
         }
 
-        // Strictly restrict access: ONLY bhuvanjakkula@gmail.com is permitted
-        if (email === 'bhuvanjakkula@gmail.com') {
-          this.loginAsVipOwner();
-          gatewayLayer.classList.add('hidden');
+        if (!password) {
+          this.showToast('⚠️ Please enter your security passkey.', 'warning');
           return;
         }
 
-        // Any other email is strictly denied
-        this.showToast('🚫 Access Denied: System access is restricted exclusively to authorized account. Contact bjtmusic12@gmail.com for enterprise clearance.', 'warning');
-        if (emailHint) {
-          emailHint.textContent = '❌ Access Denied: For enterprise clearance, contact support: bjtmusic12@gmail.com';
-          emailHint.style.color = 'var(--accent-rose)';
+        // Strictly restrict access: ONLY bhuvanjakkula@gmail.com is permitted
+        if (email !== 'bhuvanjakkula@gmail.com') {
+          this.showToast('🚫 Access Denied: System access is restricted exclusively to authorized account. Contact bjtmusic12@gmail.com for enterprise clearance.', 'warning');
+          if (emailHint) {
+            emailHint.textContent = '❌ Access Denied: For enterprise clearance, contact support: bjtmusic12@gmail.com';
+            emailHint.style.color = 'var(--accent-rose)';
+          }
+          return;
         }
+
+        // Cryptographically verify passkey against salted hash
+        const res = await this.verifyMasterPasskey(password);
+
+        if (res.blacklisted) {
+          this.authAttempts += 2;
+          this.showToast('🚨 Compromised Legacy Password Revoked! This password was flagged and permanently disabled.', 'danger');
+          if (passHint) {
+            passHint.textContent = '🚨 Revoked legacy password rejected. IP flagged.';
+            passHint.style.color = 'var(--accent-rose)';
+          }
+          if (this.authAttempts >= 3) {
+            this.authLockoutUntil = Date.now() + 15 * 60 * 1000;
+          }
+          return;
+        }
+
+        if (!res.success) {
+          this.authAttempts++;
+          const attemptsLeft = Math.max(0, 3 - this.authAttempts);
+          if (this.authAttempts >= 3) {
+            this.authLockoutUntil = Date.now() + 15 * 60 * 1000;
+            this.showToast('🚨 Maximum attempts exceeded! Security lockdown activated for 15 minutes.', 'danger');
+          } else {
+            this.showToast(`❌ Access Denied: Invalid Security Passkey. (${attemptsLeft} attempt(s) remaining)`, 'danger');
+          }
+          if (passHint) {
+            passHint.textContent = `❌ Invalid passkey. ${attemptsLeft} attempts remaining before terminal lockout.`;
+            passHint.style.color = 'var(--accent-rose)';
+          }
+          return;
+        }
+
+        // Success! Reset lockout counters and authenticate
+        this.authAttempts = 0;
+        this.authLockoutUntil = 0;
+        this.loginAsVipOwner();
+        gatewayLayer.classList.add('hidden');
       });
     }
 

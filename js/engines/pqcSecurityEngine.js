@@ -405,7 +405,7 @@ export class PQCSecurityEngine {
         timestamp: new Date(Date.now() - 1800000).toISOString(),
         type: 'VIP_OWNER_MASTER_CLEARANCE',
         actor: 'bhuvanjakkula@gmail.com',
-        summary: `VIP Master Quantum Clearance assigned to bhuvanjakkula@gmail.com (Zero Password Bypass + 100% Free Lifetime Access)`,
+        summary: `VIP Master Quantum Clearance assigned to bhuvanjakkula@gmail.com (Salted Zero-Knowledge Passkey + Anti-Brute-Force Armor)`,
         hash: '0x49a1d8f763e025ca' + this.generateQuantumHex(16),
         pqcSign: 'mldsa65_vip_owner_' + this.generateQuantumHex(12),
         verified: true

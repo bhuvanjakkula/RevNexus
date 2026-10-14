@@ -4121,10 +4121,13 @@
         </div>
 
         <!-- Password Field -->
-        <div class="form-group" id="group-auth-password" style="display: none;">
-          <label class="form-label" id="auth-label-password">Security Passkey</label>
-          <input type="password" id="auth-input-password" class="form-input" placeholder="••••••••••••" value="">
-          <span class="field-hint" id="auth-password-hint">Enter your secure password.</span>
+        <div class="form-group" id="group-auth-password" style="display: block;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+            <label class="form-label" id="auth-label-password" style="margin: 0;">Security Passkey</label>
+            <button type="button" id="btn-auth-toggle-pass" style="background: none; border: none; font-size: 0.72rem; color: var(--accent-cyan); cursor: pointer;">Show</button>
+          </div>
+          <input type="password" id="auth-input-password" class="form-input" placeholder="••••••••••••" value="" required autocomplete="current-password">
+          <span class="field-hint" id="auth-password-hint">Enter your secure master passkey.</span>
         </div>
 
         <!-- Submit Button -->

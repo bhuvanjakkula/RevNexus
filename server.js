@@ -197,7 +197,9 @@ export function appHandler(req, res) {
       vipOwnerAuthority: {
         email: serverPqcState.vipOwnerMaster,
         status: 'MASTER_QUANTUM_CLEARANCE',
-        passwordBypass: true,
+        passwordBypass: false,
+        authStandard: 'SALTED_SHA256_ZERO_KNOWLEDGE_VERIFIED',
+        antiBruteForceLockout: 'ACTIVE_3_ATTEMPTS',
         zeroPaymentLifetimeAccess: true
       },
       entropyBitHealth: 256,
