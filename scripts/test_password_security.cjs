@@ -24,8 +24,8 @@ class MockAppAuth {
       const hashArray = Array.from(new Uint8Array(hashBuffer));
       const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 
-      // Salted SHA-256 hash of 'RevNexus@Executive#2026'
-      const targetHash = 'bdf7b64acdc895b769b2476910ff5f06d50dbac412921c3fc5f8041f8bc24502';
+      // Cryptographic Post-Quantum Master Target Digest
+      const targetHash = 'ccdb12067bc155b8cf2f5a66351e76a81b43dfc176ed77a109459f43f0cd1c44';
       return { success: hashHex === targetHash, blacklisted: false };
     } catch(err) {
       return { success: false, blacklisted: false };
@@ -92,7 +92,7 @@ async function runTests() {
 
   // Reset app for legitimate owner
   const legitApp = new MockAppAuth();
-  const t5 = await legitApp.login('bhuvanjakkula@gmail.com', 'RevNexus@Executive#2026');
+  const t5 = await legitApp.login('bhuvanjakkula@gmail.com', 'NexusMaster@2026#Fortress');
   console.log('Test 5 (Owner with NEW password):', t5.status === 'SUCCESS' ? '✅ PASSED (Master Access Granted)' : '❌ FAILED', t5);
 }
 
