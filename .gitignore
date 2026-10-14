@@ -1,0 +1,27 @@
+# Node dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Testing & temporary test profiles
+.temp/
+*.log
+edge_*
+temp_*
+scratchpad_*
+
+# Deployment & build artifacts
+.vercel
+.render
+dist/
+build/
+
+# Operating System metadata
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+.env.local
+.env.production

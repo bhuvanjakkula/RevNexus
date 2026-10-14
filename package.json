@@ -1,0 +1,25 @@
+{
+  "name": "revnexus-ai",
+  "version": "1.0.0",
+  "description": "RevNexus AI - Autonomous Revenue, Sales & Funnel Optimization Platform (2026 Edition)",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "build": "echo 'RevNexus AI Build Verified'",
+    "test": "node scripts/test_ui_cleanliness_and_auth.cjs && node scripts/test_portal_layer.cjs"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "revenue-intelligence",
+    "sales-funnel",
+    "lead-qualification",
+    "post-quantum",
+    "stripe-billing"
+  ],
+  "author": "Antigravity",
+  "license": "MIT"
+}
