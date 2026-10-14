@@ -22,7 +22,9 @@ const parsedPort = parseInt(rawPort, 10);
 // Ensure valid integer port > 0; guard against '0000' or malformed inputs
 const PORT = (!isNaN(parsedPort) && parsedPort > 0) ? parsedPort : (process.env.NODE_ENV === 'production' ? 10000 : 3030);
 const HOST = '0.0.0.0';
-const PUBLIC_DIR = __dirname;
+const PUBLIC_DIR = fs.existsSync(path.join(process.cwd(), 'index.html'))
+  ? process.cwd()
+  : (fs.existsSync(path.join(__dirname, 'index.html')) ? __dirname : path.join(__dirname, '..'));
 
 const MIME_TYPES = {
   '.html': 'text/html; charset=UTF-8',
