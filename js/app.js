@@ -69,7 +69,7 @@ class RevNexusApp {
     this.funnelStep = 3;
     this.personaChatHistories = {};
 
-    // User Authentication State (bhuvanjakkula@gmail.com VIP zero-password bypass)
+    // User Authentication State - Strictly gated exclusively to bhuvanjakkula@gmail.com
     let savedUser = null;
     try {
       if (typeof localStorage !== 'undefined') {
@@ -77,16 +77,12 @@ class RevNexusApp {
       }
     } catch (e) {}
 
-    if (savedUser && savedUser.email === 'bhuvanjakkula@gmail.com') {
+    if (savedUser && savedUser.email === 'bhuvanjakkula@gmail.com' && savedUser.isLoggedIn) {
       savedUser.name = "Executive Console";
+      this.currentUser = savedUser;
+    } else {
+      this.currentUser = null;
     }
-
-    this.currentUser = savedUser || {
-      name: "Executive Console",
-      email: "bhuvanjakkula@gmail.com",
-      isVip: true,
-      isLoggedIn: true
-    };
     this.authMode = 'signin';
 
     this.driftActive = false;
@@ -3451,12 +3447,8 @@ class RevNexusApp {
     if (vipBanner) vipBanner.style.display = isVip ? 'flex' : 'none';
 
     if (isVip) {
-      if (inputPass) {
-        inputPass.placeholder = 'PASSWORD NOT REQUIRED FOR AUTHORIZED MASTER';
-        inputPass.value = '';
-      }
       if (passHint) {
-        passHint.textContent = '✅ Authorized Master Account. Direct quantum clearance granted.';
+        passHint.textContent = '✅ Authorized executive master session verified.';
         passHint.style.color = 'var(--accent-emerald)';
       }
       if (emailHint) {
@@ -3469,17 +3461,19 @@ class RevNexusApp {
         btnSubmit.disabled = false;
       }
     } else {
-      if (inputPass) inputPass.placeholder = '••••••••••••';
+      if (vipBanner) vipBanner.style.display = 'none';
       if (passHint) {
-        passHint.textContent = '⚠️ Access Denied: System access is restricted exclusively to bhuvanjakkula@gmail.com.';
-        passHint.style.color = 'var(--accent-rose)';
+        passHint.textContent = 'Enter your secure password.';
+        passHint.style.color = 'var(--text-muted)';
       }
       if (emailHint) {
-        emailHint.textContent = '❌ Access Denied: Only bhuvanjakkula@gmail.com has system clearance.';
-        emailHint.style.color = 'var(--accent-rose)';
+        emailHint.textContent = email 
+          ? '❌ Access Denied: Unrecognized email. Restricted console.'
+          : 'Authorized executive email only. All unauthorized emails are strictly blocked.';
+        emailHint.style.color = email ? 'var(--accent-rose)' : 'var(--text-muted)';
       }
       if (btnSubmit) {
-        btnSubmit.textContent = '⛔ Access Restricted';
+        btnSubmit.textContent = email ? '⛔ Access Restricted' : '🔒 Access Executive Console';
         btnSubmit.style.background = '';
       }
     }
@@ -3516,10 +3510,10 @@ class RevNexusApp {
     }
 
     // Strictly restrict access: ONLY bhuvanjakkula@gmail.com is permitted
-    this.showToast('🚫 Access Denied: System access is restricted exclusively to authorized account (bhuvanjakkula@gmail.com).', 'warning');
+    this.showToast('🚫 Access Denied: System access is restricted exclusively to authorized account. Contact bjtmusic12@gmail.com for enterprise clearance.', 'warning');
     const hint = document.getElementById('auth-email-hint');
     if (hint) {
-      hint.textContent = '❌ Access Denied: Unrecognized email. Only bhuvanjakkula@gmail.com has system clearance.';
+      hint.textContent = '❌ Access Denied: Unrecognized email. For enterprise clearance, contact support: bjtmusic12@gmail.com';
       hint.style.color = 'var(--accent-rose)';
     }
   }
@@ -3528,8 +3522,8 @@ class RevNexusApp {
     const modalAuth = document.getElementById('modal-auth');
     if (modalAuth) modalAuth.classList.add('open');
     const inputEmail = document.getElementById('auth-input-email');
-    if (inputEmail && !inputEmail.value) {
-      inputEmail.value = 'bhuvanjakkula@gmail.com';
+    if (inputEmail) {
+      inputEmail.value = '';
       this.checkVipEmail();
     }
   }
@@ -5655,26 +5649,21 @@ class RevNexusApp {
             emailHint.style.color = 'var(--accent-emerald)';
           }
           if (passHint) {
-            passHint.textContent = '✅ Passkey bypassed for authorized master executive.';
+            passHint.textContent = '✅ Authorized session access enabled.';
             passHint.style.color = 'var(--accent-emerald)';
           }
         } else {
           if (emailHint) {
-            emailHint.textContent = this.portalMode === 'signup' 
-              ? 'New tenant registration (3 Months Free Trial included).'
-              : 'Enterprise tenant email.';
-            emailHint.style.color = 'var(--text-muted)';
+            emailHint.textContent = val 
+              ? '❌ Unrecognized email. Restricted console.'
+              : 'Enter your registered work or personal email address.';
+            emailHint.style.color = val ? 'var(--accent-rose)' : 'var(--text-muted)';
+          }
+          if (passHint) {
+            passHint.textContent = 'Enter your secure account password.';
+            passHint.style.color = 'var(--text-muted)';
           }
         }
-      });
-    }
-
-    // Master clearance button
-    if (btnMaster && gatewayLayer) {
-      btnMaster.addEventListener('click', () => {
-        this.loginAsVipOwner();
-        gatewayLayer.classList.add('hidden');
-        this.showToast('⚡ Instant Master Clearance granted for bhuvanjakkula@gmail.com', 'success');
       });
     }
 
@@ -5689,47 +5678,22 @@ class RevNexusApp {
         const name = (inputName?.value || '').trim() || 'Executive Lead';
 
         if (!email) {
-          this.showToast('⚠️ Please enter a valid work or personal email ID.', 'warning');
+          this.showToast('⚠️ Please enter your email ID.', 'warning');
           return;
         }
 
-        if (!mobile) {
-          this.showToast('⚠️ Please enter your mobile phone number for 2FA and SLA routing.', 'warning');
-          return;
-        }
-
+        // Strictly restrict access: ONLY bhuvanjakkula@gmail.com is permitted
         if (email === 'bhuvanjakkula@gmail.com') {
           this.loginAsVipOwner();
           gatewayLayer.classList.add('hidden');
           return;
         }
 
-        if (this.portalMode === 'signup') {
-          this.currentUser = {
-            name: name,
-            email: email,
-            phone: country + ' ' + mobile,
-            trialActive: true,
-            trialMonths: 3,
-            isLoggedIn: true
-          };
-          try {
-            localStorage.setItem('revnexus_user', JSON.stringify(this.currentUser));
-          } catch(err) {}
-
-          this.renderAuthProfile();
-          gatewayLayer.classList.add('hidden');
-          this.showToast(`🎉 Welcome ${name}! Your 3 Months Free Trial is active. Accessing console...`, 'success');
-          if (this.logStreamEvent) {
-            this.logStreamEvent('INFO', 'ACCOUNT_SIGNUP', `New customer registered: ${email} (${country} ${mobile}) - 3 Months Free Trial`);
-          }
-        } else {
-          // Sign In mode with unauthorized email
-          this.showToast('🚫 Access Denied: Unrecognized email. Please Sign Up or contact bjtmusic12@gmail.com for clearance.', 'warning');
-          if (emailHint) {
-            emailHint.textContent = '❌ Access Denied: For enterprise clearance, contact support: bjtmusic12@gmail.com';
-            emailHint.style.color = 'var(--accent-rose)';
-          }
+        // Any other email is strictly denied
+        this.showToast('🚫 Access Denied: System access is restricted exclusively to authorized account. Contact bjtmusic12@gmail.com for enterprise clearance.', 'warning');
+        if (emailHint) {
+          emailHint.textContent = '❌ Access Denied: For enterprise clearance, contact support: bjtmusic12@gmail.com';
+          emailHint.style.color = 'var(--accent-rose)';
         }
       });
     }

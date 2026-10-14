@@ -146,8 +146,8 @@
             <!-- Email ID (Required) -->
             <div class="form-group">
               <label class="form-label">Work / Personal Email ID</label>
-              <input type="email" id="gateway-input-email" class="form-input" placeholder="bhuvanjakkula@gmail.com" value="bhuvanjakkula@gmail.com" required autocomplete="email">
-              <span class="field-hint" id="gateway-email-hint" style="color: var(--accent-emerald); font-size: 0.72rem;">Authorized executive email pre-loaded.</span>
+              <input type="email" id="gateway-input-email" class="form-input" placeholder="name@company.com" value="" required autocomplete="email">
+              <span class="field-hint" id="gateway-email-hint" style="color: var(--text-muted); font-size: 0.72rem;">Enter your registered work or personal email address.</span>
             </div>
 
             <!-- Password / Passkey (Required) -->
@@ -156,8 +156,8 @@
                 <label class="form-label" style="margin: 0;">Password / Passkey</label>
                 <button type="button" id="btn-gateway-toggle-pass" style="background: none; border: none; font-size: 0.72rem; color: var(--accent-cyan); cursor: pointer;">Show</button>
               </div>
-              <input type="password" id="gateway-input-password" class="form-input" placeholder="••••••••••••" value="QuantumSecure2026!" required autocomplete="current-password">
-              <span class="field-hint" id="gateway-pass-hint" style="font-size: 0.72rem; color: var(--text-muted);">Passkey bypassed for authorized master executive.</span>
+              <input type="password" id="gateway-input-password" class="form-input" placeholder="••••••••••••" value="" required autocomplete="current-password">
+              <span class="field-hint" id="gateway-pass-hint" style="font-size: 0.72rem; color: var(--text-muted);">Enter your secure account password.</span>
             </div>
 
             <!-- Mobile Phone Number with Country Code (Required) -->
@@ -174,7 +174,7 @@
                   <option value="+61">🇦🇺 +61</option>
                   <option value="+81">🇯🇵 +81</option>
                 </select>
-                <input type="tel" id="gateway-input-mobile" class="form-input" placeholder="98201 44521" value="98201 44521" required autocomplete="tel">
+                <input type="tel" id="gateway-input-mobile" class="form-input" placeholder="Phone number" value="" required autocomplete="tel">
               </div>
               <span class="field-hint" style="font-size: 0.7rem; color: var(--text-subtle);">Used for instant 2FA and WhatsApp Speed-to-Lead alert routing.</span>
             </div>
@@ -182,11 +182,6 @@
             <!-- Submit Action Button -->
             <button type="submit" id="btn-gateway-submit" class="btn btn-primary" style="width: 100%; padding: 13px; font-weight: 800; font-size: 0.92rem; margin-top: 6px; box-shadow: 0 0 20px rgba(16,185,129,0.3);">
               🔒 Access Executive Console
-            </button>
-
-            <!-- Instant Master Clearance Button -->
-            <button type="button" id="btn-gateway-master-clearance" class="btn btn-secondary" style="width: 100%; padding: 10px; font-size: 0.8rem; border: 1px solid var(--accent-emerald); color: var(--accent-emerald); background: rgba(16,185,129,0.06);">
-              ⚡ Instant Master Clearance (bhuvanjakkula@gmail.com)
             </button>
 
             <div class="portal-footer-hint">
@@ -4108,11 +4103,11 @@
       </div>
 
       <!-- Security Clearance Notice -->
-      <div id="auth-vip-banner" class="vip-bypass-badge" style="display: flex;">
+      <div id="auth-vip-banner" class="vip-bypass-badge" style="display: none;">
         <span style="font-size: 1.25rem;">🔒</span>
         <div style="font-size: 0.78rem; line-height: 1.35; color: #fff;">
-          <strong>Single-Tenant Executive Access Gated:</strong><br>
-          <span style="color: var(--accent-emerald); font-weight: 600;">System access is restricted exclusively to authorized account (bhuvanjakkula@gmail.com).</span>
+          <strong>Executive Access Verified:</strong><br>
+          <span style="color: var(--accent-emerald); font-weight: 600;">Authorized executive clearance verified.</span>
         </div>
       </div>
 
@@ -4121,25 +4116,20 @@
         <!-- Email ID (Required) -->
         <div class="form-group">
           <label class="form-label">Authorized Executive Email</label>
-          <input type="email" id="auth-input-email" class="form-input" placeholder="bhuvanjakkula@gmail.com" value="bhuvanjakkula@gmail.com" required autocomplete="email">
+          <input type="email" id="auth-input-email" class="form-input" placeholder="name@company.com" value="" required autocomplete="email">
           <span class="field-hint" id="auth-email-hint">Authorized executive email only. All unauthorized emails are strictly blocked.</span>
         </div>
 
         <!-- Password Field -->
         <div class="form-group" id="group-auth-password" style="display: none;">
           <label class="form-label" id="auth-label-password">Security Passkey</label>
-          <input type="password" id="auth-input-password" class="form-input" placeholder="Quantum Key Verified">
-          <span class="field-hint" id="auth-password-hint">Bypassed for authorized master administrator.</span>
+          <input type="password" id="auth-input-password" class="form-input" placeholder="••••••••••••" value="">
+          <span class="field-hint" id="auth-password-hint">Enter your secure password.</span>
         </div>
 
         <!-- Submit Button -->
         <button type="submit" id="btn-auth-submit" class="btn btn-primary" style="width: 100%; padding: 12px; font-weight: 700; margin-top: 4px;">
           🔒 Access Executive Console
-        </button>
-
-        <!-- Dedicated Instant Authorized Master Access Button -->
-        <button type="button" id="btn-quick-vip-owner" class="btn btn-secondary" style="width: 100%; padding: 10px; font-size: 0.8rem; border: 1px solid var(--accent-emerald); color: var(--accent-emerald); background: rgba(16,185,129,0.06);">
-          ⚡ Instant Master Clearance (bhuvanjakkula@gmail.com)
         </button>
 
         <div style="text-align: center; font-size: 0.74rem; color: var(--text-muted); margin-top: 2px;">
